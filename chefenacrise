@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pobre na Cozinha</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Chewy&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-color: #fff8e1; /* Creme */
+            --primary: #ff6f00; /* Laranja Fome */
+            --accent: #d32f2f; /* Vermelho Ketchup */
+            --text: #4e342e; /* Marrom Café */
+            --card-bg: #ffffff;
+            --shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Roboto', sans-serif; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        /* --- CABEÇALHO --- */
+        .header {
+            background: var(--primary);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 10;
+        }
+
+        .logo-icon { font-size: 3rem; color: #fff; margin-bottom: 5px; animation: bounce 2s infinite; }
+        .app-title { font-family: 'Chewy', cursive; font-size: 2.5rem; color: #fff; text-shadow: 2px 2px 0px var(--accent); }
+        .app-subtitle { color: rgba(255,255,255,0.9); font-size: 0.9rem; margin-top: 5px; font-style: italic; }
+
+        /* --- CONTAINER PRINCIPAL --- */
+        .container {
+            flex: 1;
+            padding: 20px;
+            max-width: 500px;
+            margin: 0 auto;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- TELA 1: INGREDIENTES --- */
+        #screen-input { display: flex; flex-direction: column; gap: 20px; }
+
+        .mascot-box {
+            text-align: center;
+            background: #fff;
+            padding: 20px;
+            border-radius: 20px;
+            border: 2px dashed var(--primary);
+            margin-bottom: 10px;
+        }
+        .mascot-img { font-size: 4rem; margin-bottom: 10px; display: block; }
+        .mascot-text { font-size: 1.1rem; font-weight: bold; color: var(--accent); }
+
+        .input-box { position: relative; }
+        .ingredient-input {
+            width: 100%;
+            padding: 20px;
+            border: 3px solid var(--text);
+            border-radius: 15px;
+            font-size: 1.1rem;
+            outline: none;
+            background: #fff;
+            box-shadow: 5px 5px 0px rgba(0,0,0,0.1);
+        }
+        .ingredient-input:focus { border-color: var(--primary); }
+
+        .helper-text { font-size: 0.85rem; color: #777; margin-top: 5px; text-align: center; }
+
+        .btn-cook {
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 18px;
+            font-size: 1.3rem;
+            font-family: 'Chewy', cursive;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 0px #b71c1c;
+            transition: transform 0.1s;
+            margin-top: 10px;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .btn-cook:active { transform: translateY(4px); box-shadow: 0 2px 0px #b71c1c; }
+
+        /* --- TELA 2: RECEITA --- */
+        #screen-result { display: none; animation: slideUp 0.5s ease; }
+
+        .recipe-card {
+            background: #fff;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 2px solid var(--text);
+        }
+
+        .recipe-header {
+            background: var(--primary);
+            padding: 20px;
+            color: white;
+            text-align: center;
+        }
+        .recipe-title { font-family: 'Chewy', cursive; font-size: 2rem; margin-bottom: 5px; }
+        .recipe-tag { background: rgba(0,0,0,0.2); padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; }
+
+        .recipe-body { padding: 25px; }
+        
+        .section-title {
+            color: var(--accent);
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            border-bottom: 2px dashed #ddd;
+            padding-bottom: 5px;
+            display: flex; align-items: center; gap: 8px;
+        }
+
+        .ingredients-list, .steps-list { list-style: none; margin-bottom: 25px; }
+        .ingredients-list li { margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+        .ingredients-list li::before { content: '🥕'; font-size: 0.8rem; }
+        
+        .steps-list li { margin-bottom: 15px; position: relative; padding-left: 30px; }
+        .steps-list li::before { 
+            content: counter(step); counter-increment: step;
+            position: absolute; left: 0; top: 0;
+            background: var(--text); color: #fff; width: 22px; height: 22px;
+            border-radius: 50%; text-align: center; font-size: 0.8rem; line-height: 22px;
+            font-weight: bold;
+        }
+        .steps-list { counter-reset: step; }
+
+        .fun-fact {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            color: #1565c0;
+            margin-top: 20px;
+            border: 1px solid #90caf9;
+            text-align: center;
+            font-style: italic;
+        }
+
+        .btn-back {
+            background: var(--text);
+            color: #fff;
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 15px;
+            font-weight: bold;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+
+        /* --- LOADING (PANELA MEXENDO) --- */
+        #screen-loading {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .pan-icon { font-size: 5rem; color: var(--accent); margin-bottom: 20px; animation: cook 1s infinite alternate; }
+        .loading-text { font-size: 1.2rem; font-weight: bold; color: var(--text); }
+
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        @keyframes cook { from { transform: rotate(-10deg); } to { transform: rotate(10deg); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="logo-icon"><i class="fas fa-utensils"></i></div>
+        <div class="app-title">Pobre na Cozinha</div>
+        <div class="app-subtitle">"O Chef da Crise"</div>
+    </div>
+
+    <div class="container">
+
+        <div id="screen-input">
+            <div class="mascot-box">
+                <span class="mascot-img">🤔</span>
+                <div class="mascot-text">"Minha filha, o que tem na geladeira hoje? Só água e luz?"</div>
+            </div>
+
+            <div class="input-box">
+                <textarea id="ingredients" class="ingredient-input" rows="4" placeholder="Ex: Arroz velho, 2 ovos, salsicha, meio tomate murcho..."></textarea>
+                <div class="helper-text">Separe com vírgula (ou só jogue tudo aí)</div>
+            </div>
+
+            <button class="btn-cook" onclick="findRecipe()">
+                <i class="fas fa-magic"></i> FAZER MILAGRE
+            </button>
+        </div>
+
+        <div id="screen-loading">
+            <i class="fas fa-blender pan-icon"></i>
+            <div class="loading-text" id="loadingMsg">Consultando os astros...</div>
+        </div>
+
+        <div id="screen-result">
+            <div class="recipe-card">
+                <div class="recipe-header">
+                    <div class="recipe-title" id="recTitle">Mexidão de Luxo</div>
+                    <div class="recipe-tag" id="recTag">Nível: Sobrevivente</div>
+                </div>
+                
+                <div class="recipe-body">
+                    <div class="section-title"><i class="fas fa-shopping-basket"></i> O que vai usar:</div>
+                    <ul class="ingredients-list" id="recIngredients">
+                        </ul>
+
+                    <div class="section-title"><i class="fas fa-fire"></i> Como fazer (sem queimar):</div>
+                    <ol class="steps-list" id="recSteps">
+                        </ol>
+
+                    <div class="fun-fact" id="recFun">
+                        <i class="fas fa-lightbulb"></i> Dica: Se ficar ruim, coloque queijo ralado que resolve.
+                    </div>
+
+                    <button class="btn-back" onclick="resetApp()">
+                        <i class="fas fa-undo"></i> TENTAR OUTRA COISA
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+<script>
+    // --- BANCO DE DADOS DE RECEITAS "POBRE GOURMET" ---
+    const recipesDB = [
+        {
+            keywords: ['ovo', 'ovos'],
+            title: "Omelete de Hotel 5 Estrelas",
+            tag: "Rápido e Barato",
+            ingredients: ["Seus ovos", "O que tiver de sobra (tomate, cebola, queijo)", "Sal e Orégano (o segredo)", "Um pingo de leite (pra render)"],
+            steps: [
+                "Bata os ovos como se eles te devessem dinheiro.",
+                "Misture o leite e o orégano pra dar aquele cheiro de pizzaria.",
+                "Jogue na frigideira quente (com óleo ou manteiga).",
+                "Quando firmar, jogue o recheio e dobre. Se quebrar, virou ovos mexidos (ninguém vai saber)."
+            ],
+            fun: "Dica: Chame de 'Omelette du Fromage' para a família achar chique."
+        },
+        {
+            keywords: ['arroz', 'velho', 'sobra'],
+            title: "Bolinho de Arroz da Vovó",
+            tag: "Salva Almoço",
+            ingredients: ["Arroz de ontem (ou anteontem)", "1 Ovo", "Farinha de trigo", "Tempero verde"],
+            steps: [
+                "Misture o arroz com o ovo e temperos numa tigela.",
+                "Vá colocando farinha até dar pra fazer bolinhas (ou colheradas).",
+                "Frite no óleo quente até dourar.",
+                "Sirva quente antes que murche."
+            ],
+            fun: "O único jeito de comer arroz de 3 dias atrás sorrindo."
+        },
+        {
+            keywords: ['salsicha', 'vina'],
+            title: "Macarrão com Vina Gourmet",
+            tag: "Clássico Brasileiro",
+            ingredients: ["Macarrão (qualquer um)", "Salsicha picada", "Molho de tomate", "Cebola"],
+            steps: [
+                "Cozinhe o macarrão (não deixe virar papa!).",
+                "Frite a cebola e a salsicha em rodelas.",
+                "Jogue o molho, um pouco de água e deixe ferver.",
+                "Misture tudo e finja que é culinária italiana."
+            ],
+            fun: "Se tiver milho, vira prato de festa."
+        },
+        {
+            keywords: ['batata'],
+            title: "Batata Recheada de Pobre",
+            tag: "Parece difícil mas não é",
+            ingredients: ["Batatas grandes", "Requeijão ou Manteiga", "Qualquer sobra de carne/frio"],
+            steps: [
+                "Cozinhe as batatas com casca até ficarem macias.",
+                "Cave um buraco no meio delas (coma o miolo enquanto faz).",
+                "Encha com manteiga e o recheio que tiver.",
+                "Leve ao forno/microondas só pra derreter."
+            ],
+            fun: "Sustenta por 3 dias."
+        },
+        {
+            keywords: ['frango', 'peito'],
+            title: "Fricassê de Liquidificador",
+            tag: "Almoço de Domingo",
+            ingredients: ["Frango desfiado", "Milho", "Creme de leite", "Requeijão (se tiver)"],
+            steps: [
+                "Bata o milho (com a água) e o creme de leite no liquidificador.",
+                "Refogue o frango e jogue esse creme em cima.",
+                "Deixe engrossar.",
+                "Jogue batata palha em cima pra dar crocância."
+            ],
+            fun: "A batata palha esconde qualquer erro no molho."
+        },
+        {
+            keywords: ['miojo', 'lamen'],
+            title: "Lamen Universitário",
+            tag: "Fim de Mês",
+            ingredients: ["Miojo", "1 Ovo cozido", "Cebolinha", "Resto de carne"],
+            steps: [
+                "Faça o miojo normal (mas jogue o pózinho fora, use sal e alho).",
+                "Coloque num prato fundo bonito.",
+                "Arrume o ovo cortado e a carne em cima.",
+                "Jogue cebolinha pra parecer saudável."
+            ],
+            fun: "Coma com hashi (pauzinhos) para se sentir no Japão."
+        },
+        {
+            keywords: ['pão', 'velho'],
+            title: "Pudim de Pão (A Sobremesa)",
+            tag: "Nada se perde",
+            ingredients: ["Pão velho picado", "Leite", "Ovos", "Açúcar"],
+            steps: [
+                "Bata tudo no liquidificador até virar uma massa.",
+                "Faça uma calda de açúcar na forma.",
+                "Asse em banho-maria por uns 40 min.",
+                "Espere esfriar pra desenformar (ou coma na forma mesmo)."
+            ],
+            fun: "Pão duro vira pudim mole. A vida é bela."
+        }
+    ];
+
+    const fallbackRecipe = {
+        title: "O Lendário Mexidão",
+        tag: "Limpa Geladeira",
+        ingredients: ["TUDO o que você escreveu aí", "Arroz", "Farinha (opcional)", "1 Ovo frito em cima"],
+        steps: [
+            "Pegue uma frigideira grande.",
+            "Refogue cebola e alho.",
+            "Jogue as carnes/legumes primeiro pra esquentar.",
+            "Jogue o arroz e misture bem.",
+            "Finalize com cheiro verde e um ovo frito em cima."
+        ],
+        fun: "O prato oficial da família brasileira. Combina com tudo, até com banana."
+    };
+
+    const funnyMessages = [
+        "Consultando os espíritos da fome...",
+        "Perguntando pra vizinha...",
+        "Calculando se dá pra comprar carne...",
+        "Verificando a validade dos produtos...",
+        "Invocando a Ana Maria Braga..."
+    ];
+
+    // --- LÓGICA ---
+    function findRecipe() {
+        const input = document.getElementById('ingredients').value.toLowerCase();
+        
+        if (!input.trim()) {
+            alert("Ô minha filha, digita alguma coisa aí! Vento não enche barriga!");
+            return;
+        }
+
+        // Troca telas
+        document.getElementById('screen-input').style.display = 'none';
+        document.getElementById('screen-loading').style.display = 'flex';
+        
+        // Mensagem aleatória
+        document.getElementById('loadingMsg').innerText = funnyMessages[Math.floor(Math.random() * funnyMessages.length)];
+
+        setTimeout(() => {
+            let found = null;
+
+            // Busca simples
+            for (let rec of recipesDB) {
+                for (let key of rec.keywords) {
+                    if (input.includes(key)) {
+                        found = rec;
+                        break;
+                    }
+                }
+                if (found) break;
+            }
+
+            if (!found) found = fallbackRecipe;
+
+            renderRecipe(found);
+
+            document.getElementById('screen-loading').style.display = 'none';
+            document.getElementById('screen-result').style.display = 'block';
+        }, 2000);
+    }
+
+    function renderRecipe(rec) {
+        document.getElementById('recTitle').innerText = rec.title;
+        document.getElementById('recTag').innerText = rec.tag;
+        
+        const ul = document.getElementById('recIngredients');
+        ul.innerHTML = '';
+        rec.ingredients.forEach(item => {
+            const li = document.createElement('li');
+            li.innerText = item;
+            ul.appendChild(li);
+        });
+
+        const ol = document.getElementById('recSteps');
+        ol.innerHTML = '';
+        rec.steps.forEach(step => {
+            const li = document.createElement('li');
+            li.innerText = step;
+            ol.appendChild(li);
+        });
+
+        document.getElementById('recFun').innerHTML = `<i class="fas fa-lightbulb"></i> ${rec.fun}`;
+    }
+
+    function resetApp() {
+        document.getElementById('screen-result').style.display = 'none';
+        document.getElementById('screen-input').style.display = 'flex';
+        document.getElementById('ingredients').value = '';
+    }
+
+</script>
+</body>
+</html>
